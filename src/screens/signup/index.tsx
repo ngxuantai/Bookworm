@@ -1,27 +1,31 @@
 import {Button, Input} from '../../components';
+import {useLoading} from '../../hooks';
 import {useNavigation} from '@react-navigation/native';
+// import {message} from '@utils';
 import {useFormik} from 'formik';
-// import i18next from 'i18next';
 import React from 'react';
-// import {useTranslation} from 'react-i18next';
-import {Text, TouchableOpacity, View} from 'react-native';
+import {Keyboard, Text, TouchableOpacity, View} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import * as Yup from 'yup';
-import loginStyles from './style';
+import signUpStyles from './styles';
 
-const LoginScreen: React.FC = () => {
-  // const {t} = useTranslation([], {keyPrefix: 'loginScreen'});
-  const styles = loginStyles();
+const SignUpScreen: React.FC = () => {
+  const styles = signUpStyles();
+  const {showLoading, hideLoading} = useLoading();
   const navigation = useNavigation();
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().email('Invalid email').required("Email can't be empty"),
+    fullname: Yup.string().trim().required('Vui lòng nhập tên của bạn'),
+    email: Yup.string()
+      .email('Email không hợp lệ')
+      .required('Vui lòng nhập email'),
     password: Yup.string()
-      .min(8, 'Password must be at least 8 characters')
-      .required("Password can't be empty"),
+      .min(8, 'Mật khẩu phải có ít nhất 8 ký tự')
+      .required('Vui lòng nhập mật khẩu'),
   });
 
   const initialValues = {
+    fullname: '',
     email: '',
     password: '',
   };
@@ -37,14 +41,18 @@ const LoginScreen: React.FC = () => {
   } = useFormik({
     validationSchema: validationSchema,
     initialValues: initialValues,
-    onSubmit: values => {
-      console.log('values', values);
+    onSubmit: (values, actions) => {
+      Keyboard.dismiss();
+      showLoading();
+      setTimeout(() => {
+        hideLoading();
+        navigation.navigate('Login');
+      }, 1000);
     },
   });
 
-  const onSignUp = () => {
-    navigation.navigate('SignUp');
-    console.log('onSignUp');
+  const onLogin = () => {
+    navigation.navigate('Login');
   };
 
   return (
@@ -53,8 +61,22 @@ const LoginScreen: React.FC = () => {
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
-        <Text style={styles.appName}>Bookworm</Text>
-        <Text style={styles.title}>Login</Text>
+        <Text style={styles.appName}></Text>
+        <Text style={styles.title}>Đăng ký để tham gia đọc truyện!</Text>
+        <Input
+          placeholder="Tên của bạn"
+          value={values.fullname}
+          onChangeText={text => {
+            setFieldValue('fullname', text);
+            setFieldTouched('fullname', true, false);
+          }}
+          onBlur={handleBlur('fullname')}
+          autoCapitalize={'words'}
+          error={
+            touched.fullname && errors.fullname ? errors.fullname : undefined
+          }
+          style={styles.inputSpacing}
+        />
         <Input
           placeholder="Email"
           value={values.email}
@@ -70,7 +92,7 @@ const LoginScreen: React.FC = () => {
         />
         <Input
           type={'password'}
-          placeholder="Password"
+          placeholder="Mật khẩu"
           value={values.password}
           onChangeText={text => {
             setFieldValue('password', text);
@@ -83,19 +105,16 @@ const LoginScreen: React.FC = () => {
           }
           style={styles.inputSpacing}
         />
-        <TouchableOpacity style={styles.buttonForgot}>
-          <Text style={styles.forgotPassword}>Forgot password</Text>
-        </TouchableOpacity>
         <Button
           block
-          title="Login"
+          title="Đăng ký"
           onPress={handleSubmit}
-          style={styles.loginButton}
+          style={styles.signInButton}
         />
-        <View style={styles.viewSignUp}>
-          <Text style={styles.noAccount}>Don't have account?</Text>
-          <TouchableOpacity onPress={onSignUp}>
-            <Text style={styles.signUp}> Sign up</Text>
+        <View style={styles.viewSignIn}>
+          <Text style={styles.haveAnAccount}>Bạn đã có tài khoản?</Text>
+          <TouchableOpacity onPress={onLogin}>
+            <Text style={styles.login}> Đăng nhập</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -103,4 +122,4 @@ const LoginScreen: React.FC = () => {
   );
 };
 
-export default LoginScreen;
+export default SignUpScreen;
