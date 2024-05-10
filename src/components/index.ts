@@ -1,6 +1,11 @@
 export {default as ActivityIndicator} from './activity-indicator';
+export {default as BottomSheet} from './bottom-sheet';
 export {default as Button} from './button';
+export {default as Divider} from './divider';
+export {default as FabButton} from './fab-button';
+export {default as HeaderDrawer} from './header/header-drawer'
 export {default as Icon} from './icon';
+export {default as ItemComic} from './item-comic';
 export {default as Input} from './input';
 export {default as Modal} from './modal';
 export {default as TextError} from './text-error';
